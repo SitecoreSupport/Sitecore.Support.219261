@@ -10,6 +10,11 @@ namespace Sitecore.Support.Resources.Media
 #pragma warning disable CS0612 // Type or member is obsolete
   public class MediaProvider : Sitecore.Resources.Media.MediaProvider
   {
+    #region Added code
+    public override string GetMediaUrl(MediaItem item) =>
+    base.GetMediaUrl(item).Replace(":443/", "/");
+    #endregion
+
     /// <summary>
     /// Gets a media URL.
     /// </summary>
@@ -51,7 +56,6 @@ namespace Sitecore.Support.Resources.Media
       {        
         if (!string.IsNullOrEmpty(item.InnerItem.Statistics.Revision)) // Fix bug: 219261
         {
-          // TODO: take into account that item may not have version in given language
           var rev = Guid.Parse(item.InnerItem.Statistics.Revision)
             .ToString("N"); // lowercase digits without hypens, braces and parentheses
 
@@ -83,8 +87,12 @@ namespace Sitecore.Support.Resources.Media
 
       path = MainUtil.EncodePath(path, '/');
       path = prefix + path + (options.IncludeExtension ? extension : string.Empty);
-      return options.LowercaseUrls ? path.ToLowerInvariant() : path;
+      #region Modified code
+      path =  options.LowercaseUrls ? path.ToLowerInvariant() : path;
+      return path.Replace(":443/", "/");
+      #endregion
     }
+
   }
 #pragma warning restore CS0612 // Type or member is obsolete
 }
